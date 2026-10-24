@@ -1,20 +1,24 @@
-/* ===== Variables ===== */
+/* ===== Variables (tokens de diseño) ===== */
 :root {
-  --bg: #0d0d10;
-  --surface: #1a1a22;
-  --surface-2: #22222d;
-  --border: #2a2a35;
-  --violet: #5b2a86;
-  --violet-light: #8a52c2;
-  --orange: #cc5500;
-  --orange-strong: #b34700;
-  --orange-text: #f28c4a;
-  --text: #ececf1;
-  --muted: #a0a0b0;
+  --bg: #0b0b0b;
+  --surface: #141414;
+  --surface-2: #1f1f1f;
+  --border: #2e2e2e;
+  --violet: #683fa0;
+  --violet-light: #8e66c8;
+  --violet-deep: #24143d;
+  --orange: #ff6b00;
+  --orange-hover: #ff8533;
+  --on-orange: #0b0b0b;
+  --text: #f5e9e5;
+  --muted: #a89f9b;
   --success: #7ddc9a;
   --danger: #ff9b9b;
   --radius: 12px;
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --font-title: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
 }
 
 /* ===== Base ===== */
@@ -22,26 +26,29 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 106.25%;
+}
+
 body {
   margin: 0;
   background-color: var(--bg);
   background-image: radial-gradient(
     ellipse at top,
-    rgba(91, 42, 134, 0.2),
+    rgba(104, 63, 160, 0.22),
     transparent 55%
   );
   background-repeat: no-repeat;
   color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.55;
+  font-family: var(--font-body);
+  line-height: 1.6;
 }
 
 h1,
 h2,
 h3 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-title);
   line-height: 1.2;
-  letter-spacing: 0.01em;
 }
 
 h1 {
@@ -63,7 +70,7 @@ img {
 }
 
 :focus-visible {
-  outline: 2px solid var(--orange-text);
+  outline: 2px solid var(--orange);
   outline-offset: 2px;
 }
 
@@ -77,46 +84,77 @@ img {
 .main {
   flex: 1;
   width: 100%;
-  max-width: 1100px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
+/* ===== Header ===== */
 .header {
   position: sticky;
   top: 0;
   z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background-color: rgba(11, 11, 11, 0.88);
+  backdrop-filter: blur(10px);
+}
+
+.header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.9rem 2rem;
-  background-color: rgba(26, 26, 34, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--violet);
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
 }
 
-.logo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.4rem;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.brand-mark {
+  flex-shrink: 0;
+  color: var(--orange);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-name {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--orange-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.logo::before {
-  content: '🌙 ';
+.brand-tagline {
+  margin-top: 0.2rem;
+  color: var(--orange);
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
 }
 
 .nav {
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1.75rem;
 }
 
 .nav a {
-  padding-bottom: 0.25rem;
+  padding: 0.35rem 0;
   border-bottom: 2px solid transparent;
   color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -125,8 +163,8 @@ img {
 }
 
 .nav a.active {
-  color: var(--orange-text);
   border-bottom-color: var(--orange);
+  color: var(--orange);
 }
 
 .cart-badge {
@@ -134,15 +172,17 @@ img {
   min-width: 1.4rem;
   padding: 0 0.4rem;
   border-radius: 999px;
-  background-color: var(--orange-strong);
-  color: var(--text);
-  font-size: 0.8rem;
+  background-color: var(--orange);
+  color: var(--on-orange);
+  font-size: 0.75rem;
+  font-weight: 700;
   text-align: center;
 }
 
+/* ===== Footer ===== */
 .footer {
   padding: 1.25rem 1rem;
-  border-top: 1px solid var(--violet);
+  border-top: 1px solid var(--border);
   background-color: var(--surface);
   color: var(--muted);
   text-align: center;
@@ -155,7 +195,7 @@ img {
 /* ===== Botones ===== */
 .btn {
   display: inline-block;
-  padding: 0.6rem 1.1rem;
+  padding: 0.65rem 1.2rem;
   border: 1px solid transparent;
   border-radius: 8px;
   font: inherit;
@@ -163,17 +203,16 @@ img {
   font-weight: 600;
   text-align: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease,
-    filter 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-primary {
-  background-color: var(--orange-strong);
-  color: var(--text);
+  background-color: var(--orange);
+  color: var(--on-orange);
 }
 
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.2);
+  background-color: var(--orange-hover);
 }
 
 .btn-secondary {
@@ -198,24 +237,24 @@ img {
   border-radius: 16px;
   background: radial-gradient(
       circle at 85% 20%,
-      rgba(204, 85, 0, 0.28),
+      rgba(255, 107, 0, 0.25),
       transparent 45%
     ),
-    linear-gradient(135deg, var(--surface), #2d1545);
+    linear-gradient(135deg, var(--surface-2), var(--violet-deep));
   box-shadow: var(--shadow);
 }
 
 .hero-kicker {
   margin: 0;
-  color: var(--orange-text);
+  color: var(--orange);
   font-size: 0.8rem;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .hero h1 {
   margin: 0.5rem 0;
-  font-size: 2.6rem;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
 }
 
 .hero p {
@@ -267,6 +306,7 @@ img {
   background-color: transparent;
   color: var(--text);
   font: inherit;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
@@ -277,7 +317,9 @@ img {
 
 .filter-btn.active {
   border-color: var(--orange);
-  background-color: var(--orange-strong);
+  background-color: var(--orange);
+  color: var(--on-orange);
+  font-weight: 600;
 }
 
 .notice {
@@ -321,10 +363,10 @@ img {
   height: 170px;
   background: radial-gradient(
       circle at 50% 40%,
-      rgba(138, 82, 194, 0.45),
+      rgba(142, 102, 200, 0.4),
       transparent 70%
     ),
-    linear-gradient(135deg, #1d0f2a, var(--violet));
+    linear-gradient(135deg, var(--violet-deep), var(--violet));
 }
 
 .product-image img {
@@ -346,9 +388,9 @@ img {
 }
 
 .product-category {
-  color: var(--orange-text);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
+  color: var(--orange);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -405,7 +447,7 @@ img {
 }
 
 .back-link:hover {
-  color: var(--orange-text);
+  color: var(--orange);
 }
 
 .detail {
@@ -425,10 +467,10 @@ img {
   border-radius: 16px;
   background: radial-gradient(
       circle at 50% 40%,
-      rgba(138, 82, 194, 0.5),
+      rgba(142, 102, 200, 0.45),
       transparent 70%
     ),
-    linear-gradient(135deg, #1d0f2a, var(--violet));
+    linear-gradient(135deg, var(--violet-deep), var(--violet));
 }
 
 .detail-image img {
@@ -453,7 +495,7 @@ img {
 
 .detail-price {
   margin: 0;
-  color: var(--orange-text);
+  color: var(--orange);
   font-size: 1.9rem;
   font-weight: 700;
 }
@@ -515,7 +557,7 @@ img {
   height: 64px;
   overflow: hidden;
   border-radius: 8px;
-  background: linear-gradient(135deg, #1d0f2a, var(--violet));
+  background: linear-gradient(135deg, var(--violet-deep), var(--violet));
   font-size: 2rem;
 }
 
@@ -537,7 +579,7 @@ img {
 }
 
 .cart-item-name:hover {
-  color: var(--orange-text);
+  color: var(--orange);
 }
 
 .cart-item-detail {
@@ -609,7 +651,7 @@ img {
 }
 
 .cart-total {
-  color: var(--orange-text);
+  color: var(--orange);
   font-size: 1.7rem;
   font-weight: 700;
 }
@@ -646,10 +688,14 @@ img {
 
 /* ===== Responsive ===== */
 @media (max-width: 640px) {
-  .header {
-    flex-wrap: wrap;
-    justify-content: center;
+  .header-inner {
+    flex-direction: column;
+    gap: 0.5rem;
     padding: 0.75rem 1rem;
+  }
+
+  .nav {
+    gap: 1.25rem;
   }
 
   .main {
@@ -658,10 +704,6 @@ img {
 
   .hero {
     padding: 2rem 1.25rem;
-  }
-
-  .hero h1 {
-    font-size: 1.8rem;
   }
 
   .cart-item {
