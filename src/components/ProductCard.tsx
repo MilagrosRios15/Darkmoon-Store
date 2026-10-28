@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ProductImage from './ProductImage';
 import { useCart } from '../context/CartContext';
-import { CATEGORY_ICONS, CATEGORY_LABELS } from '../types';
+import { CATEGORY_LABELS } from '../types';
 import type { CartResult, Product } from '../types';
 import { formatPrice } from '../utils/format';
+import { getStockStatus } from '../utils/stock';
 
 interface ProductCardProps {
   product: Product;
@@ -13,7 +15,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const [feedback, setFeedback] = useState<CartResult | null>(null);
 
-  const outOfStock = product.stock <= 0;
+  const stock = getStockStatus(product.stock);
+  const outOfStock = stock.level === 'out';
+  const detailPath = `/products/${product.id}`;
 
   const handleAdd = () => {
     setFeedback(addToCart(product, 1));
@@ -21,34 +25,40 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="product-card">
-      <div className="product-image">
-        {product.image ? (
-          <img src={product.image} alt={product.name} />
-        ) : (
-          <span className="product-icon">{CATEGORY_ICONS[product.category]}</span>
-        )}
-      </div>
+      <Link
+        to={detailPath}
+        className="product-image"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        <ProductImage product={product} />
+      </Link>
 
       <div className="product-body">
         <span className="product-category">
           {CATEGORY_LABELS[product.category]}
         </span>
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">
+          <Link to={detailPath}>{product.name}</Link>
+        </h3>
         <p className="product-price">{formatPrice(product.price)}</p>
-        {outOfStock && <span className="stock-badge">Sin stock</span>}
+        <p className={`stock-status stock-${stock.level}`}>
+          <span className="stock-dot" aria-hidden="true" />
+          {stock.label}
+        </p>
 
         <div className="product-actions">
-          <Link to={`/products/${product.id}`} className="btn btn-secondary">
-            Ver detalle
-          </Link>
           <button
             type="button"
             className="btn btn-primary"
             onClick={handleAdd}
             disabled={outOfStock}
           >
-            Agregar
+            Agregar al carrito
           </button>
+          <Link to={detailPath} className="btn btn-secondary">
+            Ver detalle
+          </Link>
         </div>
 
         {feedback && (

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ProductImage from '../components/ProductImage';
 import { useCart } from '../context/CartContext';
 import { products } from '../data/products';
-import { CATEGORY_ICONS, CATEGORY_LABELS } from '../types';
+import { CATEGORY_LABELS } from '../types';
 import type { CartResult } from '../types';
 import { formatPrice } from '../utils/format';
+import { getStockStatus } from '../utils/stock';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -39,7 +41,8 @@ export default function ProductDetail() {
     );
   }
 
-  const outOfStock = product.stock <= 0;
+  const stock = getStockStatus(product.stock);
+  const outOfStock = stock.level === 'out';
   const inCart =
     items.find((line) => line.product.id === product.id)?.quantity ?? 0;
 
@@ -56,13 +59,7 @@ export default function ProductDetail() {
 
       <div className="detail">
         <div className="detail-image">
-          {product.image ? (
-            <img src={product.image} alt={product.name} />
-          ) : (
-            <span className="detail-icon">
-              {CATEGORY_ICONS[product.category]}
-            </span>
-          )}
+          <ProductImage key={product.id} product={product} />
         </div>
 
         <div className="detail-info">
@@ -73,11 +70,11 @@ export default function ProductDetail() {
           <p className="detail-price">{formatPrice(product.price)}</p>
           <p className="detail-description">{product.description}</p>
 
-          <p className="stock-info">
-            {outOfStock
-              ? 'Sin stock'
-              : `Stock disponible: ${product.stock} unidades`}
+          <p className={`stock-status stock-${stock.level}`}>
+            <span className="stock-dot" aria-hidden="true" />
+            {stock.label}
           </p>
+          <p className="stock-info">Stock: {product.stock} unidades</p>
           {inCart > 0 && (
             <p className="stock-info">Ya tenés {inCart} en el carrito.</p>
           )}
@@ -117,4 +114,3 @@ export default function ProductDetail() {
     </div>
   );
 }
-

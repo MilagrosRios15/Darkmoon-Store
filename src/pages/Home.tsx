@@ -1,34 +1,66 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES, CATEGORY_ICONS, CATEGORY_LABELS } from '../types';
+import ProductCard from '../components/ProductCard';
+import { products } from '../data/products';
+import { CATEGORIES, CATEGORY_LABELS } from '../types';
+
+const FEATURED_IDS = [1, 4, 7, 9];
 
 export default function Home() {
+  const featuredProducts = products.filter((product) =>
+    FEATURED_IDS.includes(product.id),
+  );
+
   return (
     <div>
-      <section className="hero">
-        <p className="hero-kicker">Colección Halloween 2026</p>
-        <h1>Bienvenido a DarkMoon Store</h1>
-        <p>
-          Disfraces, decoración, accesorios y maquillaje para una noche de
-          Halloween inolvidable. Elegí tus favoritos, armá tu carrito y
-          prepará el susto perfecto.
-        </p>
-        <Link to="/products" className="btn btn-primary">
-          Ver catálogo
-        </Link>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-content">
+          <p className="hero-kicker">Colección Halloween 2026</p>
+          <h1 id="hero-title">
+            <span className="hero-title-light">La noche</span>{' '}
+            <span className="hero-title-accent">te pertenece</span>
+          </h1>
+          <p className="hero-text">
+            Disfraces, decoración, accesorios y maquillaje para una noche de
+            Halloween inolvidable. Armá tu carrito y prepará el susto
+            perfecto.
+          </p>
+          <Link to="/products" className="btn btn-primary btn-lg">
+            Explorar productos <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </section>
 
-      <section>
-        <h2>Explorá por categoría</h2>
+      <section className="home-section" aria-labelledby="categories-title">
+        <div className="section-head">
+          <h2 id="categories-title">Explorá por categoría</h2>
+          <span className="section-line" aria-hidden="true" />
+        </div>
         <div className="category-grid">
           {CATEGORIES.map((category) => (
             <Link
               key={category}
               to={`/products?category=${category}`}
-              className="category-tile"
+              className={`category-tile cat-${category}`}
             >
-              <span className="category-icon">{CATEGORY_ICONS[category]}</span>
-              <span>{CATEGORY_LABELS[category]}</span>
+              <span className="category-label">
+                {CATEGORY_LABELS[category]} <span aria-hidden="true">→</span>
+              </span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="home-section" aria-labelledby="featured-title">
+        <div className="section-head">
+          <h2 id="featured-title">Productos destacados</h2>
+          <span className="section-line" aria-hidden="true" />
+          <Link to="/products" className="section-link">
+            Ver todos <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="product-grid">
+          {featuredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>

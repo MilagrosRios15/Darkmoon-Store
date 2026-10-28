@@ -9,6 +9,7 @@ export const products: Product[] = [
     stock: 8,
     description:
       'Capa larga con cuello alto, chaleco bordó y camisa con volados. Incluye colmillos.',
+    image: '/images/vampiro.jpg',
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ export const products: Product[] = [
     stock: 12,
     description:
       'Vestido negro con detalles en violeta, capa y sombrero puntiagudo.',
+    image: '/images/bruja.jpg',
   },
   {
     id: 3,
@@ -27,6 +29,7 @@ export const products: Product[] = [
     stock: 0,
     description:
       'Mono negro con huesos que brillan en la oscuridad. Talle único adulto.',
+    image: '/images/esqueleto.jpg',
   },
   {
     id: 4,
@@ -36,6 +39,7 @@ export const products: Product[] = [
     stock: 25,
     description:
       'Calabaza decorativa de 30 cm con luz LED cálida a pilas. Ideal para entradas y ventanas.',
+    image: '/images/calabaza.jpg',
   },
   {
     id: 5,
@@ -45,6 +49,7 @@ export const products: Product[] = [
     stock: 30,
     description:
       'Guirnalda de 3 metros con murciélagos negros de cartón rígido para colgar.',
+    image: '/images/guirnalda.jpg',
   },
   {
     id: 6,
@@ -54,6 +59,7 @@ export const products: Product[] = [
     stock: 40,
     description:
       'Telaraña elástica blanca de 2 metros con 4 arañas incluidas.',
+    image: '/images/telarana.jpg',
   },
   {
     id: 7,
@@ -63,6 +69,7 @@ export const products: Product[] = [
     stock: 6,
     description:
       'Máscara de calavera con acabado envejecido y elástico ajustable.',
+    image: '/images/mascara.jpg',
   },
   {
     id: 8,
@@ -72,6 +79,7 @@ export const products: Product[] = [
     stock: 15,
     description:
       'Sombrero de fieltro negro con velo violeta y hebilla naranja.',
+    image: '/images/sombrero.png',
   },
   {
     id: 9,
