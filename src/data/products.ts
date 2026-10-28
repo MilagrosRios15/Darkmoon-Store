@@ -79,7 +79,7 @@ export const products: Product[] = [
     stock: 15,
     description:
       'Sombrero de fieltro negro con velo violeta y hebilla naranja.',
-    image: '/images/sombrero.png',
+    image: '/images/sombrero.jpg',
   },
   {
     id: 9,
@@ -89,6 +89,7 @@ export const products: Product[] = [
     stock: 10,
     description:
       'Paleta de 6 colores al agua, pincel, esponja y cicatrices de látex.',
+    image: '/images/kit-zombie.jpg',
   },
   {
     id: 10,
@@ -98,5 +99,6 @@ export const products: Product[] = [
     stock: 3,
     description:
       'Sangre artificial a base de agua, segura para la piel y fácil de lavar.',
+    image: '/images/sangre.jpg',
   },
 ];

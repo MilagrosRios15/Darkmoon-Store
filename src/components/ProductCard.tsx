@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import ProductImage from './ProductImage';
 import { useCart } from '../context/CartContext';
 import { CATEGORY_LABELS } from '../types';
@@ -13,11 +13,16 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
+  const location = useLocation();
   const [feedback, setFeedback] = useState<CartResult | null>(null);
 
   const stock = getStockStatus(product.stock);
   const outOfStock = stock.level === 'out';
   const detailPath = `/products/${product.id}`;
+  const detailState =
+    location.pathname === '/products'
+      ? { from: `${location.pathname}${location.search}` }
+      : undefined;
 
   const handleAdd = () => {
     setFeedback(addToCart(product, 1));
@@ -27,6 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <article className="product-card">
       <Link
         to={detailPath}
+        state={detailState}
         className="product-image"
         aria-hidden="true"
         tabIndex={-1}
@@ -39,7 +45,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           {CATEGORY_LABELS[product.category]}
         </span>
         <h3 className="product-name">
-          <Link to={detailPath}>{product.name}</Link>
+          <Link to={detailPath} state={detailState}>
+            {product.name}
+          </Link>
         </h3>
         <p className="product-price">{formatPrice(product.price)}</p>
         <p className={`stock-status stock-${stock.level}`}>
@@ -56,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           >
             Agregar al carrito
           </button>
-          <Link to={detailPath} className="btn btn-secondary">
+          <Link to={detailPath} state={detailState} className="btn btn-secondary">
             Ver detalle
           </Link>
         </div>

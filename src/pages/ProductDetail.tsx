@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import ProductImage from '../components/ProductImage';
 import { useCart } from '../context/CartContext';
 import { products } from '../data/products';
@@ -9,12 +9,26 @@ import type { CartResult } from '../types';
 import { formatPrice } from '../utils/format';
 import { getStockStatus } from '../utils/stock';
 
+function getCatalogPath(state: unknown): string {
+  if (typeof state === 'object' && state !== null && 'from' in state) {
+    const from = (state as { from: unknown }).from;
+
+    if (typeof from === 'string' && from.startsWith('/products')) {
+      return from;
+    }
+  }
+
+  return '/products';
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
+  const location = useLocation();
   const { items, addToCart } = useCart();
   const [quantity, setQuantity] = useState('1');
   const [feedback, setFeedback] = useState<CartResult | null>(null);
 
+  const backPath = getCatalogPath(location.state);
   const productId = Number(id);
   const product = products.find((item) => item.id === productId);
   const productName = product?.name;
@@ -53,7 +67,7 @@ export default function ProductDetail() {
 
   return (
     <div>
-      <Link to="/products" className="back-link">
+      <Link to={backPath} className="back-link">
         ← Volver al catálogo
       </Link>
 
