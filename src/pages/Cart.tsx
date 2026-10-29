@@ -43,37 +43,61 @@ export default function Cart() {
             Esto es una simulación local: el pedido no se envió a ningún
             servidor ni se guardó en una base de datos.
           </p>
+          <Link to="/products" className="btn btn-primary">
+            Seguir comprando
+          </Link>
         </div>
       )}
 
       {items.length === 0 ? (
-        <div className="cart-empty">
-          <p>Tu carrito está vacío.</p>
-          <Link to="/products" className="btn btn-primary">
-            Ver productos
-          </Link>
-        </div>
+        !lastOrder && (
+          <div className="cart-empty">
+            <svg
+              className="cart-empty-icon"
+              viewBox="0 0 24 24"
+              width="56"
+              height="56"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            <h2>Tu carrito está vacío</h2>
+            <p>Explorá el catálogo y elegí algo para tu noche de Halloween.</p>
+            <Link to="/products" className="btn btn-primary">
+              Ver productos
+            </Link>
+          </div>
+        )
       ) : (
-        <>
+        <div className="cart-layout">
           <div className="cart-list">
             {items.map((line) => (
               <CartItem key={line.product.id} line={line} />
             ))}
           </div>
 
-          <div className="cart-summary">
-            <p>
-              Total de unidades: <strong>{totalItems}</strong>
-            </p>
-            <p className="cart-total">Total: {formatPrice(totalPrice)}</p>
-            <div className="cart-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => clearCart()}
-              >
-                Vaciar carrito
-              </button>
+          <aside className="cart-summary" aria-labelledby="summary-title">
+            <h2 id="summary-title">Resumen del pedido</h2>
+
+            <dl className="summary-rows">
+              <div className="summary-row">
+                <dt>Total de unidades</dt>
+                <dd>{totalItems}</dd>
+              </div>
+              <div className="summary-row summary-total">
+                <dt>Total</dt>
+                <dd>{formatPrice(totalPrice)}</dd>
+              </div>
+            </dl>
+
+            <div className="summary-actions">
               <button
                 type="button"
                 className="btn btn-primary"
@@ -82,9 +106,24 @@ export default function Cart() {
               >
                 Finalizar pedido
               </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => clearCart()}
+              >
+                Vaciar carrito
+              </button>
+              <Link to="/products" className="summary-link">
+                ← Seguir comprando
+              </Link>
             </div>
-          </div>
-        </>
+
+            <p className="summary-note">
+              Simulación local: al finalizar no se realiza ningún cobro ni se
+              envía nada a un servidor.
+            </p>
+          </aside>
+        </div>
       )}
     </div>
   );

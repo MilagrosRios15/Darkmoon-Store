@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ProductImage from './ProductImage';
 import { useCart } from '../context/CartContext';
-import { CATEGORY_ICONS } from '../types';
+import { CATEGORY_LABELS } from '../types';
 import type { CartLine, CartResult } from '../types';
 import { getLineSubtotal } from '../utils/cart';
 import { formatPrice } from '../utils/format';
@@ -14,6 +15,7 @@ export default function CartItem({ line }: CartItemProps) {
   const { removeFromCart, updateQuantity } = useCart();
   const [feedback, setFeedback] = useState<CartResult | null>(null);
   const { product, quantity } = line;
+  const detailPath = `/products/${product.id}`;
 
   const handleChange = (newQuantity: number) => {
     const result = updateQuantity(product.id, newQuantity);
@@ -22,23 +24,31 @@ export default function CartItem({ line }: CartItemProps) {
 
   return (
     <article className="cart-item">
-      <div className="cart-item-icon">
-        {product.image ? (
-          <img src={product.image} alt={product.name} />
-        ) : (
-          <span>{CATEGORY_ICONS[product.category]}</span>
-        )}
-      </div>
+      <Link
+        to={detailPath}
+        className="cart-item-thumb"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        <ProductImage product={product} />
+      </Link>
 
       <div className="cart-item-info">
-        <Link to={`/products/${product.id}`} className="cart-item-name">
+        <span className="product-category">
+          {CATEGORY_LABELS[product.category]}
+        </span>
+        <Link to={detailPath} className="cart-item-name">
           {product.name}
         </Link>
         <p className="cart-item-detail">{formatPrice(product.price)} c/u</p>
         <p className="cart-item-detail">Stock disponible: {product.stock}</p>
       </div>
 
-      <div className="quantity-control">
+      <div
+        className="quantity-control"
+        role="group"
+        aria-label={`Cantidad de ${product.name}`}
+      >
         <button
           type="button"
           className="qty-btn"
@@ -69,7 +79,8 @@ export default function CartItem({ line }: CartItemProps) {
 
       <button
         type="button"
-        className="btn btn-secondary"
+        className="btn btn-secondary btn-sm"
+        aria-label={`Eliminar ${product.name} del carrito`}
         onClick={() => removeFromCart(product.id)}
       >
         Eliminar
