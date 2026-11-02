@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import type { FormEvent } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import type { FormEvent, MouseEvent } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProductImage from '../components/ProductImage';
 import { useCart } from '../context/CartContext';
 import { products } from '../data/products';
@@ -9,7 +9,7 @@ import type { CartResult } from '../types';
 import { formatPrice } from '../utils/format';
 import { getStockStatus } from '../utils/stock';
 
-function getCatalogPath(state: unknown): string {
+function getCatalogOrigin(state: unknown): string | null {
   if (typeof state === 'object' && state !== null && 'from' in state) {
     const from = (state as { from: unknown }).from;
 
@@ -18,17 +18,19 @@ function getCatalogPath(state: unknown): string {
     }
   }
 
-  return '/products';
+  return null;
 }
 
 export default function ProductDetail() {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { items, addToCart } = useCart();
   const [quantity, setQuantity] = useState('1');
   const [feedback, setFeedback] = useState<CartResult | null>(null);
 
-  const backPath = getCatalogPath(location.state);
+  const catalogOrigin = getCatalogOrigin(location.state);
+  const backPath = catalogOrigin ?? '/products';
   const productId = Number(id);
   const product = products.find((item) => item.id === productId);
   const productName = product?.name;
@@ -60,6 +62,20 @@ export default function ProductDetail() {
   const inCart =
     items.find((line) => line.product.id === product.id)?.quantity ?? 0;
 
+  const handleBack = (event: MouseEvent<HTMLAnchorElement>) => {
+    const plainClick =
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey;
+
+    if (catalogOrigin && plainClick) {
+      event.preventDefault();
+      navigate(-1);
+    }
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback(addToCart(product, Number(quantity)));
@@ -67,7 +83,7 @@ export default function ProductDetail() {
 
   return (
     <div>
-      <Link to={backPath} className="back-link">
+      <Link to={backPath} className="back-link" onClick={handleBack}>
         ← Volver al catálogo
       </Link>
 
