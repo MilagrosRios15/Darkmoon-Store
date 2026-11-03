@@ -3,13 +3,10 @@ import {
   BatIcon,
   BranchIcon,
   FacebookIcon,
-  HeadsetIcon,
   InstagramIcon,
   MoonIcon,
-  ShieldLockIcon,
   SparkleIcon,
   TikTokIcon,
-  TruckIcon,
   YouTubeIcon,
 } from './FooterIcons';
 
@@ -19,35 +16,11 @@ interface SocialLink {
   Icon: ComponentType;
 }
 
-interface Feature {
-  title: string;
-  text: string;
-  Icon: ComponentType;
-}
-
 const SOCIAL_LINKS: SocialLink[] = [
   { name: 'Instagram', url: '', Icon: InstagramIcon },
   { name: 'TikTok', url: '', Icon: TikTokIcon },
   { name: 'YouTube', url: '', Icon: YouTubeIcon },
   { name: 'Facebook', url: '', Icon: FacebookIcon },
-];
-
-const FEATURES: Feature[] = [
-  {
-    title: 'Envíos a todo el país',
-    text: 'Recibí tu pedido en la puerta de tu casa',
-    Icon: TruckIcon,
-  },
-  {
-    title: 'Compra segura',
-    text: 'Tus datos siempre protegidos',
-    Icon: ShieldLockIcon,
-  },
-  {
-    title: 'Atención personalizada',
-    text: 'Estamos para ayudarte',
-    Icon: HeadsetIcon,
-  },
 ];
 
 export default function Footer() {
@@ -113,18 +86,6 @@ export default function Footer() {
           ))}
         </ul>
 
-        <ul className="footer-features">
-          {FEATURES.map(({ title, text, Icon }) => (
-            <li className="footer-feature" key={title}>
-              <span className="feature-icon">
-                <Icon />
-              </span>
-              <strong className="feature-title">{title}</strong>
-              <span className="feature-text">{text}</span>
-            </li>
-          ))}
-        </ul>
-
         <div className="footer-divider" aria-hidden="true">
           <span className="footer-rule" />
           <span className="footer-sparkle">
@@ -139,9 +100,6 @@ export default function Footer() {
         <p className="footer-motto">
           Viví Halloween
           <MoonIcon size={14} />
-        </p>
-        <p className="footer-note">
-          Proyecto académico · Productos y precios de demostración (ficticios)
         </p>
       </div>
     </footer>
