@@ -1,7 +1,5 @@
 import type { ComponentType } from 'react';
 import {
-  BatIcon,
-  BranchIcon,
   FacebookIcon,
   InstagramIcon,
   MoonIcon,
@@ -26,22 +24,6 @@ const SOCIAL_LINKS: SocialLink[] = [
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-decor" aria-hidden="true">
-        <span className="footer-moon" />
-        <span className="footer-bat footer-bat-1">
-          <BatIcon />
-        </span>
-        <span className="footer-bat footer-bat-2">
-          <BatIcon />
-        </span>
-        <span className="footer-branch footer-branch-left">
-          <BranchIcon />
-        </span>
-        <span className="footer-branch footer-branch-right">
-          <BranchIcon />
-        </span>
-      </div>
-
       <div className="footer-content">
         <div className="footer-brand">
           <span className="footer-mark">
@@ -100,6 +82,9 @@ export default function Footer() {
         <p className="footer-motto">
           Viví Halloween
           <MoonIcon size={14} />
+        </p>
+        <p className="footer-note">
+          Proyecto académico · Productos y precios de demostración (ficticios)
         </p>
       </div>
     </footer>

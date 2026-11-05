@@ -5,6 +5,13 @@ import { products } from '../data/products';
 import { CATEGORIES, CATEGORY_LABELS, isCategory } from '../types';
 import type { Category } from '../types';
 
+function normalize(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -14,10 +21,19 @@ export default function Products() {
     : null;
   const invalidCategory =
     categoryParam !== null && categoryParam !== '' && activeCategory === null;
+  const searchTerm = (searchParams.get('search') ?? '').trim();
 
-  const visibleProducts = activeCategory
-    ? products.filter((product) => product.category === activeCategory)
-    : products;
+  const visibleProducts = products.filter((product) => {
+    const matchesCategory =
+      activeCategory === null || product.category === activeCategory;
+    const matchesSearch =
+      searchTerm === '' ||
+      normalize(`${product.name} ${product.description}`).includes(
+        normalize(searchTerm),
+      );
+
+    return matchesCategory && matchesSearch;
+  });
 
   useEffect(() => {
     const section = activeCategory ? CATEGORY_LABELS[activeCategory] : 'Todos';
@@ -29,11 +45,21 @@ export default function Products() {
   }, [activeCategory]);
 
   const handleCategoryChange = (category: Category | null) => {
+    const next = new URLSearchParams(searchParams);
+
     if (category === null) {
-      setSearchParams({});
+      next.delete('category');
     } else {
-      setSearchParams({ category });
+      next.set('category', category);
     }
+
+    setSearchParams(next);
+  };
+
+  const clearSearch = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('search');
+    setSearchParams(next);
   };
 
   return (
@@ -69,15 +95,35 @@ export default function Products() {
         </p>
       )}
 
+      {searchTerm !== '' && (
+        <p className="search-summary">
+          Resultados para «{searchTerm}»
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={clearSearch}
+          >
+            Limpiar búsqueda
+          </button>
+        </p>
+      )}
+
       <p className="results-count">
         Mostrando {visibleProducts.length} producto(s)
       </p>
 
-      <div className="product-grid">
-        {visibleProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {visibleProducts.length === 0 ? (
+        <div className="empty-results">
+          <p>No encontramos productos que coincidan con tu búsqueda.</p>
+          <p>Probá con otra palabra o limpiá la búsqueda.</p>
+        </div>
+      ) : (
+        <div className="product-grid">
+          {visibleProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
