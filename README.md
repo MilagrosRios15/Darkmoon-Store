@@ -2,7 +2,7 @@
 
 Tienda online de Halloween (disfraces, decoración, accesorios y maquillaje) desarrollada como trabajo académico. Es una adaptación de la consigna "Mini-App de un kiosco de barrio" a una temática de Halloween.
 
-> **Estado actual: Parte 2 (frontend + backend).** El frontend (React + TypeScript) obtiene los productos desde una API hecha con FastAPI, que guarda los datos en SQLite. Los pedidos se registran en la base de datos y descuentan el stock.
+> **Estado actual: Parte 2 (frontend + backend).** El frontend (React + TypeScript) obtiene los productos desde una API hecha con FastAPI, que guarda los datos en SQLite. Los pedidos se registran en la base de datos y descuentan el stock. Además, la tienda tiene **cuentas de usuario**: para finalizar un pedido hay que iniciar sesión.
 >
 > La versión de la **Parte 1** (solo frontend con datos mock) quedó guardada en la etiqueta [`parte-1`](https://github.com/MilagrosRios15/Darkmoon-Store/tree/parte-1).
 
@@ -24,6 +24,7 @@ Tienda online de Halloween (disfraces, decoración, accesorios y maquillaje) des
 - [SQLAlchemy](https://www.sqlalchemy.org/) para los modelos y las consultas
 - [Pydantic](https://docs.pydantic.dev/) para las validaciones
 - [Uvicorn](https://www.uvicorn.org/) como servidor
+- Módulos estándar de Python (`hashlib`, `secrets`, `hmac`) para cifrar contraseñas y generar sesiones
 
 ## Requisitos
 
@@ -83,7 +84,7 @@ La API queda disponible en `http://127.0.0.1:8000` y su documentación interacti
 
 Al iniciar por primera vez se crea automáticamente la base de datos `backend/darkmoon.db` con los 35 productos de demostración. Si la base ya tiene productos, no se vuelven a cargar (no se duplican).
 
-Para volver al stock original: detener el servidor, borrar `backend/darkmoon.db` e iniciarlo de nuevo.
+Para volver al estado inicial (stock original, sin pedidos ni cuentas): detener el servidor, borrar `backend/darkmoon.db` e iniciarlo de nuevo.
 
 ## 2. Frontend (React)
 
@@ -128,9 +129,15 @@ y volver a ejecutar `npm run dev`. Este archivo no contiene datos secretos.
 |---|---|---|
 | GET | `/api/products` | Lista los productos. Acepta `?category=` (`disfraces`, `decoracion`, `accesorios`, `maquillaje`); el filtro se hace en el backend |
 | GET | `/api/products/{id}` | Detalle de un producto. Si no existe, responde **404** |
-| POST | `/api/orders` | Crea un pedido |
-| GET | `/api/orders` | Lista los pedidos registrados |
 | POST | `/api/products` | Crea un producto (se usa para probar las validaciones de Pydantic desde `/docs`) |
+| POST | `/api/orders` | Crea un pedido. **Requiere sesión iniciada** |
+| GET | `/api/orders` | Lista los pedidos registrados |
+| POST | `/api/auth/register` | Crea una cuenta y devuelve un token de sesión |
+| POST | `/api/auth/login` | Inicia sesión y devuelve un token de sesión |
+| GET | `/api/auth/me` | Devuelve el usuario de la sesión actual |
+| POST | `/api/auth/logout` | Cierra la sesión |
+
+Los endpoints que requieren sesión reciben el token en el encabezado `Authorization: Bearer <token>`. En `/docs`, se carga con el botón **Authorize**.
 
 Ejemplo de cuerpo para crear un pedido:
 
@@ -143,17 +150,26 @@ Ejemplo de cuerpo para crear un pedido:
 }
 ```
 
+## Cuentas de usuario
+
+- **Crear cuenta:** nombre (mínimo 2 caracteres), email válido y contraseña de al menos 8 caracteres. No puede haber dos cuentas con el mismo email.
+- **Contraseñas:** nunca se guardan tal cual. Se guardan **cifradas** con PBKDF2-SHA256 y una "sal" aleatoria distinta para cada usuario (`backend/security.py`).
+- **Sesiones:** al iniciar sesión, el backend genera un token aleatorio y lo guarda en la tabla `sessions` (dura 7 días). Al cerrar sesión, se borra.
+- **En el frontend:** el estado de la sesión es global (`src/context/AuthContext.tsx`, con `useState` y `useContext`). El token se guarda en el navegador para mantener la sesión al recargar, y se verifica con el backend al abrir la página.
+- **Para comprar hay que iniciar sesión.** Si no hay sesión, el carrito muestra "Iniciá sesión para comprar" y, después de iniciar sesión, vuelve al carrito con los productos intactos.
+
 ## Cómo se registra un pedido
 
-Cuando el usuario toca **Finalizar pedido**, el frontend envía a `POST /api/orders` solo los ids de los productos y sus cantidades. El backend:
+Cuando el usuario (con la sesión iniciada) toca **Finalizar pedido**, el frontend envía a `POST /api/orders` solo los ids de los productos y sus cantidades, junto con el token de la sesión. El backend:
 
-1. Valida los datos con Pydantic (al menos un producto, ids válidos, cantidades mayores que cero).
-2. Verifica que todos los productos existan (si no, responde **404**).
-3. Verifica que haya stock suficiente de **todos** los productos (si no, responde **409** y rechaza el pedido completo).
-4. Calcula el total con los **precios guardados en la base de datos** (no confía en precios enviados por el frontend).
-5. Descuenta el stock y registra el pedido en la tabla `orders` (fecha automática, total y productos en formato JSON).
+1. Verifica la sesión (si no es válida, responde **401**).
+2. Valida los datos con Pydantic (al menos un producto, ids válidos, cantidades mayores que cero).
+3. Verifica que todos los productos existan (si no, responde **404**).
+4. Verifica que haya stock suficiente de **todos** los productos (si no, responde **409** y rechaza el pedido completo).
+5. Calcula el total con los **precios guardados en la base de datos** (no confía en precios enviados por el frontend).
+6. Descuenta el stock y registra el pedido en la tabla `orders` (fecha automática, total, productos en formato JSON y usuario que lo hizo).
 
-Los pasos 4 y 5 ocurren en una **transacción**: si algo falla, se deshace todo, así no queda un pedido a medias ni stock descontado de más.
+Los pasos 5 y 6 ocurren en una **transacción**: si algo falla, se deshace todo, así no queda un pedido a medias ni stock descontado de más.
 
 En el frontend, mientras se envía el pedido el botón muestra "Enviando pedido..." y se deshabilita. Si el pedido se confirma, se muestra el número de pedido y el carrito se vacía. Si falla (stock insuficiente, servidor apagado, etc.), se muestra el error y **el carrito se conserva**.
 
@@ -164,6 +180,7 @@ En el frontend, mientras se envía el pedido el botón muestra "Enviando pedido.
 - `stock` no puede ser negativo.
 - `category` debe ser una de las cuatro categorías de la tienda.
 - En los pedidos: al menos un producto, ids y cantidades mayores que 0, productos existentes y stock suficiente.
+- En las cuentas: nombre, email y contraseña con el formato indicado arriba.
 
 Los datos inválidos se rechazan con el código **422**.
 
@@ -177,6 +194,8 @@ Los datos inválidos se rechazan con el código **422**.
 | `/products?search=calavera` | Products | Búsqueda por texto desde el buscador del Header |
 | `/products/:id` | ProductDetail | Detalle de un producto y selección de cantidad |
 | `/cart` | Cart | Carrito de compras |
+| `/login` | Login | Iniciar sesión |
+| `/register` | Register | Crear cuenta |
 | `*` | NotFound | Página 404 |
 
 Todas las rutas comparten el mismo `Layout` (Header + contenido + Footer).
@@ -211,12 +230,14 @@ Los datos mock de la Parte 1 (`src/data/products.ts`) quedaron **comentados**: l
 backend/
 ├── main.py               # inicio de FastAPI, CORS y creación de tablas
 ├── database.py           # configuración de SQLite
-├── models.py             # tablas products y orders (SQLAlchemy)
+├── models.py             # tablas products, orders, users y sessions (SQLAlchemy)
 ├── schemas.py            # validaciones y respuestas (Pydantic)
+├── security.py           # cifrado de contraseñas y sesiones
 ├── seed.py               # productos iniciales
 ├── routers/
 │   ├── products.py       # endpoints de productos
-│   └── orders.py         # endpoints de pedidos
+│   ├── orders.py         # endpoints de pedidos
+│   └── auth.py           # endpoints de cuentas
 └── requirements.txt
 public/
 └── images/               # fotos de productos, categorías, fondo y logo
@@ -231,20 +252,24 @@ src/
 │   ├── ProductImage.tsx
 │   └── ScrollManager.tsx
 ├── context/
-│   └── CartContext.tsx
+│   ├── AuthContext.tsx   # estado global de la sesión
+│   └── CartContext.tsx   # estado global del carrito
 ├── data/
 │   └── products.ts       # datos mock de la Parte 1 (comentados)
 ├── pages/
 │   ├── Cart.tsx
 │   ├── Home.tsx
+│   ├── Login.tsx
 │   ├── NotFound.tsx
 │   ├── ProductDetail.tsx
-│   └── Products.tsx
+│   ├── Products.tsx
+│   └── Register.tsx
 ├── services/
 │   └── api.ts            # funciones para llamar a la API con fetch
 ├── types/
 │   └── index.ts
 ├── utils/
+│   ├── auth.ts
 │   ├── cart.ts
 │   ├── format.ts
 │   └── stock.ts

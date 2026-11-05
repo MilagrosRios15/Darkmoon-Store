@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from '../components/CartItem';
+import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { createOrder, getErrorMessage } from '../services/api';
+import { ApiError, createOrder, getErrorMessage } from '../services/api';
 import type { Order } from '../types';
 import { formatPrice } from '../utils/format';
 
@@ -15,6 +16,7 @@ function formatDate(isoDate: string): string {
 
 export default function Cart() {
   const { items, clearCart, totalItems, totalPrice } = useCart();
+  const { user, token, checking, expireSession } = useAuth();
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -30,7 +32,7 @@ export default function Cart() {
   }, []);
 
   const handleCheckout = async () => {
-    if (items.length === 0 || sendingRef.current) return;
+    if (items.length === 0 || sendingRef.current || token === null) return;
 
     sendingRef.current = true;
     setSending(true);
@@ -38,21 +40,29 @@ export default function Cart() {
     setLastOrder(null);
 
     try {
-      // Se envían solo ids y cantidades: el backend calcula precios y total.
+      // Se envían solo ids y cantidades (más el token de la sesión):
+      // el backend calcula precios y total.
       const order = await createOrder(
         items.map((line) => ({
           productId: line.product.id,
           quantity: line.quantity,
         })),
+        token,
       );
       setLastOrder(order);
       // El carrito se vacía SOLO después de que el servidor confirmó.
       clearCart();
     } catch (error) {
-      // Si falla, se muestra el error y el carrito se conserva.
-      setOrderError(
-        getErrorMessage(error, 'Ocurrió un error inesperado. Intentá de nuevo.'),
-      );
+      // 401: la sesión venció; se cierra y se pide iniciar sesión de nuevo.
+      if (error instanceof ApiError && error.status === 401) {
+        expireSession();
+        setOrderError('Tu sesión venció. Iniciá sesión de nuevo para finalizar el pedido.');
+      } else {
+        // Cualquier otro error: se muestra y el carrito se conserva.
+        setOrderError(
+          getErrorMessage(error, 'Ocurrió un error inesperado. Intentá de nuevo.'),
+        );
+      }
     } finally {
       sendingRef.current = false;
       setSending(false);
@@ -149,17 +159,36 @@ export default function Cart() {
             </dl>
 
             <div className="summary-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => {
-                  void handleCheckout();
-                }}
-                disabled={items.length === 0 || sending}
-                aria-busy={sending}
-              >
-                {sending ? 'Enviando pedido...' : 'Finalizar pedido'}
-              </button>
+              {checking ? (
+                <button type="button" className="btn btn-primary" disabled>
+                  Verificando sesión...
+                </button>
+              ) : user ? (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    void handleCheckout();
+                  }}
+                  disabled={items.length === 0 || sending}
+                  aria-busy={sending}
+                >
+                  {sending ? 'Enviando pedido...' : 'Finalizar pedido'}
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    state={{ from: '/cart' }}
+                    className="btn btn-primary"
+                  >
+                    Iniciá sesión para comprar
+                  </Link>
+                  <p className="cart-login-note">
+                    Tu carrito se guarda mientras iniciás sesión.
+                  </p>
+                </>
+              )}
               <button
                 type="button"
                 className="btn btn-secondary"

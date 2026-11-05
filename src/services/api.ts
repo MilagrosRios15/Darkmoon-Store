@@ -1,5 +1,5 @@
 import { isCategory } from '../types';
-import type { Order, OrderItemInput, Product } from '../types';
+import type { AuthResult, Order, OrderItemInput, Product, User } from '../types';
 
 // ---------- Configuración ----------
 
@@ -11,7 +11,7 @@ export const API_URL = (envApiUrl ?? 'http://127.0.0.1:8000').replace(/\/+$/, ''
 // ---------- Errores ----------
 
 // Error de la API con un mensaje para mostrar al usuario.
-// status es el código HTTP (404, 409...) o null si no hubo respuesta
+// status es el código HTTP (401, 404, 409...) o null si no hubo respuesta
 // (servidor apagado, sin conexión, CORS).
 export class ApiError extends Error {
   status: number | null;
@@ -46,6 +46,14 @@ async function readErrorMessage(response: Response): Promise<string> {
   return `El servidor respondió con un error (${response.status}). Intentá de nuevo.`;
 }
 
+// Arma los encabezados; si hay token, agrega "Authorization: Bearer <token>".
+function buildHeaders(token?: string, withBody = false): HeadersInit {
+  const headers: Record<string, string> = {};
+  if (withBody) headers['Content-Type'] = 'application/json';
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
 // Función base: hace el fetch y trata los dos tipos de error.
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   let response: Response;
@@ -66,6 +74,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   // fetch NO lanza un error en estos casos, por eso se revisa response.ok.
   if (!response.ok) {
     throw new ApiError(await readErrorMessage(response), response.status);
+  }
+
+  // 204 = respuesta correcta sin contenido (por ejemplo, cerrar sesión).
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   try {
@@ -133,7 +146,7 @@ function toOrder(data: ApiOrder): Order {
   };
 }
 
-// ---------- Funciones ----------
+// ---------- Productos y pedidos ----------
 
 // GET /api/products o /api/products?category=...
 export async function getProducts(
@@ -154,9 +167,12 @@ export async function getProductById(
   return toProduct(data);
 }
 
-// POST /api/orders: se envían solo ids y cantidades.
+// POST /api/orders: se envían solo ids y cantidades, más el token de la sesión.
 // El precio y el total los calcula el backend.
-export async function createOrder(items: OrderItemInput[]): Promise<Order> {
+export async function createOrder(
+  items: OrderItemInput[],
+  token: string,
+): Promise<Order> {
   const body = {
     items: items.map((item) => ({
       product_id: item.productId,
@@ -166,9 +182,55 @@ export async function createOrder(items: OrderItemInput[]): Promise<Order> {
 
   const data = await request<ApiOrder>('/api/orders', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildHeaders(token, true),
     body: JSON.stringify(body),
   });
 
   return toOrder(data);
+}
+
+// ---------- Cuentas ----------
+
+// POST /api/auth/register
+export async function registerUser(
+  name: string,
+  email: string,
+  password: string,
+): Promise<AuthResult> {
+  return request<AuthResult>('/api/auth/register', {
+    method: 'POST',
+    headers: buildHeaders(undefined, true),
+    body: JSON.stringify({ name, email, password }),
+  });
+}
+
+// POST /api/auth/login
+export async function loginUser(
+  email: string,
+  password: string,
+): Promise<AuthResult> {
+  return request<AuthResult>('/api/auth/login', {
+    method: 'POST',
+    headers: buildHeaders(undefined, true),
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+// GET /api/auth/me: comprueba que el token siga siendo válido.
+export async function getCurrentUser(
+  token: string,
+  signal?: AbortSignal,
+): Promise<User> {
+  return request<User>('/api/auth/me', {
+    headers: buildHeaders(token),
+    signal,
+  });
+}
+
+// POST /api/auth/logout
+export async function logoutUser(token: string): Promise<void> {
+  await request<void>('/api/auth/logout', {
+    method: 'POST',
+    headers: buildHeaders(token),
+  });
 }

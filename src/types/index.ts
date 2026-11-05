@@ -69,3 +69,18 @@ export interface Order {
   total: number;
   items: OrderLine[];
 }
+
+// ---------- Cuentas ----------
+
+// Datos públicos del usuario (nunca incluye la contraseña).
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Respuesta al crear cuenta o iniciar sesión.
+export interface AuthResult {
+  token: string;
+  user: User;
+}
