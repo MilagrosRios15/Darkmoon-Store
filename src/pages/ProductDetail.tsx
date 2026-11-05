@@ -3,9 +3,9 @@ import type { FormEvent, MouseEvent } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProductImage from '../components/ProductImage';
 import { useCart } from '../context/CartContext';
-import { products } from '../data/products';
+import { ApiError, getErrorMessage, getProductById } from '../services/api';
 import { CATEGORY_LABELS } from '../types';
-import type { CartResult } from '../types';
+import type { CartResult, Product } from '../types';
 import { formatPrice } from '../utils/format';
 import { getStockStatus } from '../utils/stock';
 
@@ -21,6 +21,14 @@ function getCatalogOrigin(state: unknown): string | null {
   return null;
 }
 
+// Resultado de una carga del producto.
+interface DetailState {
+  key: string;
+  product: Product | null;
+  notFound: boolean;
+  error: string | null;
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const location = useLocation();
@@ -28,24 +36,119 @@ export default function ProductDetail() {
   const { items, addToCart } = useCart();
   const [quantity, setQuantity] = useState('1');
   const [feedback, setFeedback] = useState<CartResult | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
+  const [loaded, setLoaded] = useState<DetailState | null>(null);
 
   const catalogOrigin = getCatalogOrigin(location.state);
   const backPath = catalogOrigin ?? '/products';
   const productId = Number(id);
-  const product = products.find((item) => item.id === productId);
+  const validId = Number.isInteger(productId) && productId > 0;
+  const requestKey = `${productId}#${reloadCount}`;
+
+  // Pide el producto al backend: GET /api/products/{id}
+  useEffect(() => {
+    if (!validId) return;
+
+    const controller = new AbortController();
+
+    getProductById(productId, controller.signal)
+      .then((product) => {
+        if (!controller.signal.aborted) {
+          setLoaded({ key: requestKey, product, notFound: false, error: null });
+        }
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+
+        // 404: el servidor respondió que el producto no existe.
+        if (error instanceof ApiError && error.status === 404) {
+          setLoaded({ key: requestKey, product: null, notFound: true, error: null });
+          return;
+        }
+
+        // Cualquier otro error: servidor caído, sin conexión, etc.
+        setLoaded({
+          key: requestKey,
+          product: null,
+          notFound: false,
+          error: getErrorMessage(error, 'Intentá de nuevo en unos segundos.'),
+        });
+      });
+
+    return () => controller.abort();
+  }, [productId, requestKey, validId]);
+
+  const current = loaded !== null && loaded.key === requestKey ? loaded : null;
+  const isLoading = validId && current === null;
+  const notFound = !validId || current?.notFound === true;
+  const product = current?.product ?? null;
   const productName = product?.name;
 
   useEffect(() => {
-    document.title = productName
-      ? `${productName} | DarkMoon Store`
-      : 'Producto no encontrado | DarkMoon Store';
+    if (productName) {
+      document.title = `${productName} | DarkMoon Store`;
+    } else if (notFound) {
+      document.title = 'Producto no encontrado | DarkMoon Store';
+    }
 
     return () => {
       document.title = 'DarkMoon Store';
     };
-  }, [productName]);
+  }, [productName, notFound]);
 
-  if (!product) {
+  const handleBack = (event: MouseEvent<HTMLAnchorElement>) => {
+    const plainClick =
+      event.button === 0 &&
+      !event.metaKey &&
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.altKey;
+
+    if (catalogOrigin && plainClick) {
+      event.preventDefault();
+      navigate(-1);
+    }
+  };
+
+  const backLink = (
+    <Link to={backPath} className="back-link" onClick={handleBack}>
+      ← Volver al catálogo
+    </Link>
+  );
+
+  if (isLoading) {
+    return (
+      <div>
+        {backLink}
+        <p className="status-message" role="status">
+          Cargando producto...
+        </p>
+      </div>
+    );
+  }
+
+  if (current?.error) {
+    return (
+      <div>
+        {backLink}
+        <div className="status-error" role="alert">
+          <h2>No se pudo cargar el producto.</h2>
+          <p>{current.error}</p>
+          <div className="status-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setReloadCount((count) => count + 1)}
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || product === null) {
     return (
       <div className="product-missing">
         <h1>Producto no encontrado</h1>
@@ -62,20 +165,6 @@ export default function ProductDetail() {
   const inCart =
     items.find((line) => line.product.id === product.id)?.quantity ?? 0;
 
-  const handleBack = (event: MouseEvent<HTMLAnchorElement>) => {
-    const plainClick =
-      event.button === 0 &&
-      !event.metaKey &&
-      !event.ctrlKey &&
-      !event.shiftKey &&
-      !event.altKey;
-
-    if (catalogOrigin && plainClick) {
-      event.preventDefault();
-      navigate(-1);
-    }
-  };
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback(addToCart(product, Number(quantity)));
@@ -83,9 +172,7 @@ export default function ProductDetail() {
 
   return (
     <div>
-      <Link to={backPath} className="back-link" onClick={handleBack}>
-        ← Volver al catálogo
-      </Link>
+      {backLink}
 
       <div className="detail">
         <div className="detail-image">

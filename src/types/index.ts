@@ -44,3 +44,28 @@ export interface CartResult {
   ok: boolean;
   message: string;
 }
+
+// ---------- Pedidos (Parte 2) ----------
+
+// Lo que el frontend envía por cada producto: solo id y cantidad.
+export interface OrderItemInput {
+  productId: number;
+  quantity: number;
+}
+
+// Un renglón del pedido ya calculado por el backend.
+export interface OrderLine {
+  productId: number;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+  subtotal: number;
+}
+
+// El pedido registrado que devuelve el backend.
+export interface Order {
+  id: number;
+  createdAt: string;
+  total: number;
+  items: OrderLine[];
+}

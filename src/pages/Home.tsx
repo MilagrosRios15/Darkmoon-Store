@@ -1,15 +1,52 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { getErrorMessage, getProducts } from '../services/api';
 import { CATEGORIES, CATEGORY_LABELS } from '../types';
+import type { Product } from '../types';
 
 // Uno por categoría: Vampiro, Calabaza, Máscara de Calavera y Kit Zombie.
 const FEATURED_IDS = [1, 10, 20, 28];
 
+interface FeaturedState {
+  key: number;
+  products: Product[];
+  error: string | null;
+}
+
 export default function Home() {
-  const featuredProducts = products.filter((product) =>
-    FEATURED_IDS.includes(product.id),
-  );
+  const [reloadCount, setReloadCount] = useState(0);
+  const [loaded, setLoaded] = useState<FeaturedState | null>(null);
+
+  // Pide los productos al backend y se queda con los destacados.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getProducts(undefined, controller.signal)
+      .then((products) => {
+        if (!controller.signal.aborted) {
+          setLoaded({
+            key: reloadCount,
+            products: products.filter((product) =>
+              FEATURED_IDS.includes(product.id),
+            ),
+            error: null,
+          });
+        }
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        setLoaded({
+          key: reloadCount,
+          products: [],
+          error: getErrorMessage(error, 'Intentá de nuevo en unos segundos.'),
+        });
+      });
+
+    return () => controller.abort();
+  }, [reloadCount]);
+
+  const current = loaded !== null && loaded.key === reloadCount ? loaded : null;
 
   return (
     <div>
@@ -59,11 +96,32 @@ export default function Home() {
             Ver todos <span aria-hidden="true">→</span>
           </Link>
         </div>
-        <div className="product-grid">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+
+        {current === null ? (
+          <p className="status-message" role="status">
+            Cargando productos...
+          </p>
+        ) : current.error !== null ? (
+          <div className="status-error" role="alert">
+            <h2>No se pudieron cargar los productos destacados.</h2>
+            <p>{current.error}</p>
+            <div className="status-actions">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setReloadCount((count) => count + 1)}
+              >
+                Reintentar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="product-grid">
+            {current.products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

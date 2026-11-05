@@ -1,3 +1,9 @@
+// DATOS MOCK DE LA PARTE 1 (comentados en la Parte 2).
+// Desde la Parte 2 el catálogo se obtiene del backend (GET /api/products).
+// Se conservan solo como referencia: la aplicación ya no los usa.
+export {};
+/*
+
 import type { Product } from '../types';
 
 export const products: Product[] = [
@@ -359,3 +365,5 @@ export const products: Product[] = [
     image: '/images/tatuajes-temporales.jpg',
   },
 ];
+
+*/

@@ -1,17 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartItem from '../components/CartItem';
 import { useCart } from '../context/CartContext';
+import { createOrder, getErrorMessage } from '../services/api';
+import type { Order } from '../types';
 import { formatPrice } from '../utils/format';
 
-interface OrderSummary {
-  units: number;
-  total: number;
+function formatDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return Number.isNaN(date.getTime())
+    ? isoDate
+    : date.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
 }
 
 export default function Cart() {
   const { items, clearCart, totalItems, totalPrice } = useCart();
-  const [lastOrder, setLastOrder] = useState<OrderSummary | null>(null);
+  const [lastOrder, setLastOrder] = useState<Order | null>(null);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  // Evita enviar el pedido dos veces si se hace doble clic muy rápido.
+  const sendingRef = useRef(false);
 
   useEffect(() => {
     document.title = 'Carrito | DarkMoon Store';
@@ -21,12 +29,44 @@ export default function Cart() {
     };
   }, []);
 
-  const handleCheckout = () => {
-    if (items.length === 0) return;
+  const handleCheckout = async () => {
+    if (items.length === 0 || sendingRef.current) return;
 
-    setLastOrder({ units: totalItems, total: totalPrice });
-    clearCart();
+    sendingRef.current = true;
+    setSending(true);
+    setOrderError(null);
+    setLastOrder(null);
+
+    try {
+      // Se envían solo ids y cantidades: el backend calcula precios y total.
+      const order = await createOrder(
+        items.map((line) => ({
+          productId: line.product.id,
+          quantity: line.quantity,
+        })),
+      );
+      setLastOrder(order);
+      // El carrito se vacía SOLO después de que el servidor confirmó.
+      clearCart();
+    } catch (error) {
+      // Si falla, se muestra el error y el carrito se conserva.
+      setOrderError(
+        getErrorMessage(error, 'Ocurrió un error inesperado. Intentá de nuevo.'),
+      );
+    } finally {
+      sendingRef.current = false;
+      setSending(false);
+    }
   };
+
+  const handleClear = () => {
+    clearCart();
+    setOrderError(null);
+  };
+
+  const orderUnits = lastOrder
+    ? lastOrder.items.reduce((total, item) => total + item.quantity, 0)
+    : 0;
 
   return (
     <div>
@@ -34,18 +74,29 @@ export default function Cart() {
 
       {lastOrder && (
         <div className="order-success" role="status">
-          <h2>¡Pedido simulado confirmado!</h2>
+          <h2>¡Pedido confirmado!</h2>
           <p>
-            Compraste {lastOrder.units} unidad(es) por un total de{' '}
-            {formatPrice(lastOrder.total)}.
+            Tu pedido <strong>N.º {lastOrder.id}</strong> quedó registrado el{' '}
+            {formatDate(lastOrder.createdAt)}.
           </p>
           <p>
-            Esto es una simulación local: el pedido no se envió a ningún
-            servidor ni se guardó en una base de datos.
+            Compraste {orderUnits} unidad(es) por un total de{' '}
+            {formatPrice(lastOrder.total)}.
           </p>
           <Link to="/products" className="btn btn-primary">
             Seguir comprando
           </Link>
+        </div>
+      )}
+
+      {orderError && (
+        <div className="order-error" role="alert">
+          <h2>No pudimos confirmar tu pedido</h2>
+          <p>{orderError}</p>
+          <p>
+            Tu carrito se mantiene: podés ajustar las cantidades e intentar de
+            nuevo.
+          </p>
         </div>
       )}
 
@@ -101,15 +152,19 @@ export default function Cart() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={handleCheckout}
-                disabled={items.length === 0}
+                onClick={() => {
+                  void handleCheckout();
+                }}
+                disabled={items.length === 0 || sending}
+                aria-busy={sending}
               >
-                Finalizar pedido
+                {sending ? 'Enviando pedido...' : 'Finalizar pedido'}
               </button>
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => clearCart()}
+                onClick={handleClear}
+                disabled={sending}
               >
                 Vaciar carrito
               </button>
@@ -119,8 +174,8 @@ export default function Cart() {
             </div>
 
             <p className="summary-note">
-              Simulación local: al finalizar no se realiza ningún cobro ni se
-              envía nada a un servidor.
+              El stock y los precios se confirman con el servidor al finalizar
+              el pedido.
             </p>
           </aside>
         </div>
