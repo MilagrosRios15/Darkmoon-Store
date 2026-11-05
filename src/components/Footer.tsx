@@ -1,12 +1,5 @@
 import type { ComponentType } from 'react';
-import {
-  FacebookIcon,
-  InstagramIcon,
-  MoonIcon,
-  SparkleIcon,
-  TikTokIcon,
-  YouTubeIcon,
-} from './FooterIcons';
+import { InstagramIcon, MoonIcon, SparkleIcon } from './FooterIcons';
 
 interface SocialLink {
   name: string;
@@ -16,9 +9,6 @@ interface SocialLink {
 
 const SOCIAL_LINKS: SocialLink[] = [
   { name: 'Instagram', url: '', Icon: InstagramIcon },
-  { name: 'TikTok', url: '', Icon: TikTokIcon },
-  { name: 'YouTube', url: '', Icon: YouTubeIcon },
-  { name: 'Facebook', url: '', Icon: FacebookIcon },
 ];
 
 export default function Footer() {
@@ -27,7 +17,7 @@ export default function Footer() {
       <div className="footer-content">
         <div className="footer-brand">
           <span className="footer-mark">
-            <MoonIcon size={40} />
+            <img src="/images/logo.jpg" alt="" width="56" height="56" />
           </span>
 
           <div className="footer-name-row">
@@ -83,9 +73,7 @@ export default function Footer() {
           Viví Halloween
           <MoonIcon size={14} />
         </p>
-        <p className="footer-note">
-          Proyecto académico · Productos y precios de demostración (ficticios)
-        </p>
+        <p className="footer-note">DarkMoon Store – 2026</p>
       </div>
     </footer>
   );

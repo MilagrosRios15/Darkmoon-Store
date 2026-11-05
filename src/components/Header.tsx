@@ -81,18 +81,13 @@ export default function Header() {
           className="brand"
           aria-label="DarkMoon Store, ir al inicio"
         >
-          <svg
+          <img
             className="brand-mark"
-            viewBox="0 0 24 24"
-            width="34"
-            height="34"
-            aria-hidden="true"
-          >
-            <path
-              d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-              fill="currentColor"
-            />
-          </svg>
+            src="/images/logo.jpg"
+            alt=""
+            width="40"
+            height="40"
+          />
           <span className="brand-text">
             <span className="brand-name">DarkMoon Store</span>
             <span className="brand-tagline">Tienda de Halloween</span>
