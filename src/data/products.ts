@@ -1,6 +1,7 @@
 import type { Product } from '../types';
 
 export const products: Product[] = [
+  // ---------- Disfraces ----------
   {
     id: 1,
     name: 'Disfraz de Vampiro Victoriano',
@@ -8,7 +9,7 @@ export const products: Product[] = [
     price: 45900,
     stock: 8,
     description:
-      'Capa larga con cuello alto, chaleco bordó y camisa con volados. Incluye colmillos.',
+      'Capa larga con cuello alto, chaleco bordó y camisa con volados. Incluye colmillos. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/vampiro.jpg',
   },
   {
@@ -18,7 +19,7 @@ export const products: Product[] = [
     price: 38500,
     stock: 12,
     description:
-      'Vestido negro con detalles en violeta, capa y sombrero puntiagudo.',
+      'Vestido negro con detalles en violeta, capa y sombrero puntiagudo. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/bruja.jpg',
   },
   {
@@ -33,118 +34,46 @@ export const products: Product[] = [
   },
   {
     id: 4,
-    name: 'Calabaza Tallada con Luz LED',
-    category: 'decoracion',
-    price: 12800,
-    stock: 25,
-    description:
-      'Calabaza decorativa de 30 cm con luz LED cálida a pilas. Ideal para entradas y ventanas.',
-    image: '/images/calabaza.jpg',
-  },
-  {
-    id: 5,
-    name: 'Guirnalda de Murciélagos',
-    category: 'decoracion',
-    price: 9600,
-    stock: 30,
-    description:
-      'Guirnalda de 3 metros con murciélagos negros de cartón rígido para colgar.',
-    image: '/images/guirnalda.jpg',
-  },
-  {
-    id: 6,
-    name: 'Telaraña Gigante con Arañas',
-    category: 'decoracion',
-    price: 7400,
-    stock: 40,
-    description:
-      'Telaraña elástica blanca de 2 metros con 4 arañas incluidas.',
-    image: '/images/telarana.jpg',
-  },
-  {
-    id: 7,
-    name: 'Máscara de Calavera de Resina',
-    category: 'accesorios',
-    price: 22300,
-    stock: 6,
-    description:
-      'Máscara de calavera con acabado envejecido y elástico ajustable.',
-    image: '/images/mascara.jpg',
-  },
-  {
-    id: 8,
-    name: 'Sombrero de Bruja con Velo',
-    category: 'accesorios',
-    price: 11500,
-    stock: 15,
-    description:
-      'Sombrero de fieltro negro con velo violeta y hebilla naranja.',
-    image: '/images/sombrero.jpg',
-  },
-  {
-    id: 9,
-    name: 'Kit de Maquillaje Artístico Zombie',
-    category: 'maquillaje',
-    price: 14900,
-    stock: 10,
-    description:
-      'Paleta de 6 colores al agua, pincel, esponja y cicatrices de látex.',
-    image: '/images/kit-zombie.jpg',
-  },
-  {
-    id: 10,
-    name: 'Sangre Falsa Lavable 120 ml',
-    category: 'maquillaje',
-    price: 4200,
-    stock: 3,
-    description:
-      'Sangre artificial a base de agua, segura para la piel y fácil de lavar.',
-    image: '/images/sangre.jpg',
-  },
-
-  // ---------- Disfraces ----------
-  {
-    id: 11,
     name: 'Disfraz de Payaso Siniestro',
     category: 'disfraces',
     price: 43500,
     stock: 7,
     description:
-      'Traje de estilo victoriano negro y rojo oscuro, con cuello de volados, mangas a rayas y máscara teatral.',
+      'Traje de estilo victoriano negro y rojo oscuro, con cuello de volados, mangas a rayas y máscara teatral. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/payaso.jpg',
   },
   {
-    id: 12,
+    id: 5,
     name: 'Disfraz de Novia Cadáver',
     category: 'disfraces',
     price: 47800,
     stock: 5,
     description:
-      'Vestido de novia marfil envejecido con encaje negro, rosas bordó, velo delicado y tela rasgada.',
+      'Vestido de novia marfil envejecido con encaje negro, rosas bordó, velo delicado y tela rasgada. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/novia-cadaver.jpg',
   },
   {
-    id: 13,
+    id: 6,
     name: 'Disfraz de Demonio Oscuro',
     category: 'disfraces',
     price: 44900,
     stock: 9,
     description:
-      'Capa larga negra con detalles carmesí y tocado con cuernos, de estilo gótico.',
+      'Capa larga negra con detalles carmesí y tocado con cuernos, de estilo gótico. Talle único adulto.',
     image: '/images/demonio.jpg',
   },
   {
-    id: 14,
+    id: 7,
     name: 'Disfraz de Hada Oscura',
     category: 'disfraces',
     price: 39900,
     stock: 6,
     description:
-      'Vestido negro con falda de tul y alas plegables con brillo violeta.',
+      'Vestido negro con falda de tul y alas plegables con brillo violeta. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/hada-oscura.jpg',
   },
   {
-    id: 15,
+    id: 8,
     name: 'Disfraz de Momia Ancestral',
     category: 'disfraces',
     price: 36700,
@@ -154,20 +83,50 @@ export const products: Product[] = [
     image: '/images/momia-ancestral.jpg',
   },
   {
-    id: 16,
+    id: 9,
     name: 'Disfraz de Pirata Fantasma',
     category: 'disfraces',
     price: 42600,
     stock: 4,
     description:
-      'Saco largo desgastado, camisa con volados y sombrero de pirata.',
+      'Saco largo desgastado, camisa con volados y sombrero de pirata. Talles: 12, 14 y 16 (adolescente); S, M, L y XL (adulto).',
     image: '/images/pirata-fantasma.jpg',
   },
 
   // ---------- Decoración ----------
   {
-    id: 17,
-    name: 'Candelabros LED Góticos',
+    id: 10,
+    name: 'Calabaza Tallada con Luz LED',
+    category: 'decoracion',
+    price: 12800,
+    stock: 25,
+    description:
+      'Calabaza decorativa de 30 cm con luz LED cálida a pilas. Ideal para entradas y ventanas.',
+    image: '/images/calabaza.jpg',
+  },
+  {
+    id: 11,
+    name: 'Guirnalda de Murciélagos',
+    category: 'decoracion',
+    price: 9600,
+    stock: 30,
+    description:
+      'Guirnalda de 3 metros con murciélagos negros de cartón rígido para colgar.',
+    image: '/images/guirnalda.jpg',
+  },
+  {
+    id: 12,
+    name: 'Telaraña Gigante con Arañas',
+    category: 'decoracion',
+    price: 7400,
+    stock: 40,
+    description:
+      'Telaraña elástica blanca de 2 metros con 4 arañas incluidas.',
+    image: '/images/telarana.jpg',
+  },
+  {
+    id: 13,
+    name: 'Candelabros LED',
     category: 'decoracion',
     price: 18900,
     stock: 14,
@@ -176,7 +135,7 @@ export const products: Product[] = [
     image: '/images/candelabros.jpg',
   },
   {
-    id: 18,
+    id: 14,
     name: 'Lápidas Decorativas para Jardín',
     category: 'decoracion',
     price: 15600,
@@ -186,7 +145,7 @@ export const products: Product[] = [
     image: '/images/lapidas.jpg',
   },
   {
-    id: 19,
+    id: 15,
     name: 'Luces LED de Calabazas',
     category: 'decoracion',
     price: 10800,
@@ -196,7 +155,7 @@ export const products: Product[] = [
     image: '/images/luces-calabazas.jpg',
   },
   {
-    id: 20,
+    id: 16,
     name: 'Centro de Mesa con Calavera',
     category: 'decoracion',
     price: 13400,
@@ -206,7 +165,7 @@ export const products: Product[] = [
     image: '/images/centro-mesa-calavera.jpg',
   },
   {
-    id: 21,
+    id: 17,
     name: 'Espejo Embrujado',
     category: 'decoracion',
     price: 21500,
@@ -216,7 +175,7 @@ export const products: Product[] = [
     image: '/images/espejo-embrujado.jpg',
   },
   {
-    id: 22,
+    id: 18,
     name: 'Faroles con Fantasmas',
     category: 'decoracion',
     price: 16200,
@@ -226,7 +185,7 @@ export const products: Product[] = [
     image: '/images/faroles-fantasma.jpg',
   },
   {
-    id: 23,
+    id: 19,
     name: 'Ramo de Rosas Negras',
     category: 'decoracion',
     price: 8900,
@@ -238,7 +197,27 @@ export const products: Product[] = [
 
   // ---------- Accesorios ----------
   {
-    id: 24,
+    id: 20,
+    name: 'Máscara de Calavera de Resina',
+    category: 'accesorios',
+    price: 22300,
+    stock: 6,
+    description:
+      'Máscara de calavera con acabado envejecido y elástico ajustable.',
+    image: '/images/mascara.jpg',
+  },
+  {
+    id: 21,
+    name: 'Sombrero de Bruja con Velo',
+    category: 'accesorios',
+    price: 11500,
+    stock: 15,
+    description:
+      'Sombrero de fieltro negro con velo violeta y hebilla naranja.',
+    image: '/images/sombrero.jpg',
+  },
+  {
+    id: 22,
     name: 'Máscara de Baile Veneciano',
     category: 'accesorios',
     price: 17800,
@@ -248,7 +227,7 @@ export const products: Product[] = [
     image: '/images/mascara-veneciana.jpg',
   },
   {
-    id: 25,
+    id: 23,
     name: 'Colmillos de Vampiro',
     category: 'accesorios',
     price: 3900,
@@ -258,17 +237,17 @@ export const products: Product[] = [
     image: '/images/colmillos.jpg',
   },
   {
-    id: 26,
+    id: 24,
     name: 'Guantes Negros de Encaje',
     category: 'accesorios',
     price: 6800,
     stock: 16,
     description:
-      'Par de guantes góticos de encaje negro con diseño floral y estilo vintage.',
+      'Par de guantes de encaje negro con diseño floral y estilo vintage.',
     image: '/images/guantes-encaje.jpg',
   },
   {
-    id: 27,
+    id: 25,
     name: 'Vincha de Murciélagos',
     category: 'accesorios',
     price: 5400,
@@ -278,8 +257,8 @@ export const products: Product[] = [
     image: '/images/vincha-murcielagos.jpg',
   },
   {
-    id: 28,
-    name: 'Abanico Gótico de Plumas',
+    id: 26,
+    name: 'Abanico de Plumas',
     category: 'accesorios',
     price: 9400,
     stock: 8,
@@ -288,7 +267,7 @@ export const products: Product[] = [
     image: '/images/abanico-plumas.jpg',
   },
   {
-    id: 29,
+    id: 27,
     name: 'Set de Hebillas con Calaveras',
     category: 'accesorios',
     price: 4800,
@@ -299,6 +278,26 @@ export const products: Product[] = [
   },
 
   // ---------- Maquillaje ----------
+  {
+    id: 28,
+    name: 'Kit de Maquillaje Artístico Zombie',
+    category: 'maquillaje',
+    price: 14900,
+    stock: 10,
+    description:
+      'Paleta de 6 colores al agua, pincel, esponja y cicatrices de látex.',
+    image: '/images/kit-zombie.jpg',
+  },
+  {
+    id: 29,
+    name: 'Sangre Falsa Lavable 120 ml',
+    category: 'maquillaje',
+    price: 4200,
+    stock: 3,
+    description:
+      'Sangre artificial a base de agua, segura para la piel y fácil de lavar.',
+    image: '/images/sangre.jpg',
+  },
   {
     id: 30,
     name: 'Paleta de Sombras Halloween',

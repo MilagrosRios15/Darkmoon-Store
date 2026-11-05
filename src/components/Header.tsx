@@ -89,7 +89,7 @@ export default function Header() {
             height="40"
           />
           <span className="brand-text">
-            <span className="brand-name">DarkMoon Store</span>
+            <span className="brand-name">DarkMoon</span>
             <span className="brand-tagline">Tienda de Halloween</span>
           </span>
         </Link>

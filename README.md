@@ -1,6 +1,6 @@
 # DarkMoon Store
 
-Tienda online de Halloween (disfraces, decoración, accesorios y maquillaje) desarrollada como trabajo académico. Es una adaptación de la consigna "Mini-App de un kiosco" a una temática de Halloween.
+Tienda online de Halloween (disfraces, decoración, accesorios y maquillaje) desarrollada como trabajo académico. Es una adaptación de la consigna "Mini-App de un kiosco de barrio" a una temática de Halloween.
 
 > **Estado actual: Parte 1 (frontend).** La aplicación usa datos de demostración locales y **no tiene backend**. La finalización del pedido es una **simulación local**: no se envía a ningún servidor ni se guarda en una base de datos.
 
@@ -42,6 +42,7 @@ npm run lint    # revisa el código con ESLint
 | `/` | Home | Bienvenida y acceso al catálogo |
 | `/products` | Products | Listado de productos con filtro por categoría |
 | `/products?category=disfraces` | Products | Filtro por categoría mediante query params |
+| `/products?search=calavera` | Products | Búsqueda por texto desde el buscador del Header |
 | `/products/:id` | ProductDetail | Detalle de un producto y selección de cantidad |
 | `/cart` | Cart | Carrito de compras |
 | `*` | NotFound | Página 404 |
@@ -49,6 +50,10 @@ npm run lint    # revisa el código con ESLint
 Todas las rutas comparten el mismo `Layout` (Header + contenido + Footer).
 
 Categorías disponibles: `disfraces`, `decoracion`, `accesorios` y `maquillaje`. Si la URL tiene una categoría inexistente, se muestra un aviso y se listan todos los productos.
+
+## Datos de demostración
+
+El catálogo tiene 35 productos de demostración definidos en `src/data/products.ts`. Las fotos de los productos están en `public/images`.
 
 ## Cómo funciona el carrito
 
@@ -67,13 +72,18 @@ Reglas:
 ## Estructura del proyecto
 
 ```text
+public/
+└── images/               # fotos de productos, categorías, fondo y logo
 src/
 ├── components/
 │   ├── CartItem.tsx
 │   ├── Footer.tsx
+│   ├── FooterIcons.tsx
 │   ├── Header.tsx
 │   ├── Layout.tsx
-│   └── ProductCard.tsx
+│   ├── ProductCard.tsx
+│   ├── ProductImage.tsx
+│   └── ScrollManager.tsx
 ├── context/
 │   └── CartContext.tsx
 ├── data/
@@ -88,7 +98,8 @@ src/
 │   └── index.ts
 ├── utils/
 │   ├── cart.ts
-│   └── format.ts
+│   ├── format.ts
+│   └── stock.ts
 ├── App.tsx
 ├── index.css
 └── main.tsx

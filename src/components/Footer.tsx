@@ -8,7 +8,7 @@ interface SocialLink {
 }
 
 const SOCIAL_LINKS: SocialLink[] = [
-  { name: 'Instagram', url: '', Icon: InstagramIcon },
+  { name: 'Instagram', url: 'https://www.instagram.com/mmili_rios?obrf=MTdlb3c2eDdoeGVwdA%3D%3D&utm_source=q', Icon: InstagramIcon },
 ];
 
 export default function Footer() {
@@ -25,7 +25,7 @@ export default function Footer() {
             <span className="footer-sparkle" aria-hidden="true">
               <SparkleIcon />
             </span>
-            <p className="footer-name">DarkMoon Store</p>
+            <p className="footer-name">DarkMoon</p>
             <span className="footer-sparkle" aria-hidden="true">
               <SparkleIcon />
             </span>
@@ -67,13 +67,13 @@ export default function Footer() {
         </div>
 
         <p className="footer-copy">
-          © 2026 DarkMoon Store. Todos los derechos reservados.
+          © 2026 DarkMoon. Todos los derechos reservados.
         </p>
         <p className="footer-motto">
           Viví Halloween
           <MoonIcon size={14} />
         </p>
-        <p className="footer-note">DarkMoon Store – 2026</p>
+        <p className="footer-note">DarkMoon – 2026</p>
       </div>
     </footer>
   );

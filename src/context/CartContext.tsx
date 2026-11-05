@@ -15,6 +15,11 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Devuelve "1 unidad" o "N unidades" para que los mensajes queden bien escritos.
+function formatUnits(amount: number): string {
+  return amount === 1 ? '1 unidad' : `${amount} unidades`;
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartLine[]>([]);
 
@@ -22,12 +27,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!Number.isInteger(quantity) || quantity < 1) {
       return {
         ok: false,
-        message: 'La cantidad debe ser un número entero mayor o igual a 1.',
+        message: 'Ingresá una cantidad válida (mínimo 1).',
       };
     }
 
     if (product.stock <= 0) {
-      return { ok: false, message: 'Este producto no tiene stock.' };
+      return {
+        ok: false,
+        message: 'Producto agotado. Por ahora no hay unidades disponibles.',
+      };
     }
 
     const existing = items.find((item) => item.product.id === product.id);
@@ -35,9 +43,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const newQuantity = currentQuantity + quantity;
 
     if (newQuantity > product.stock) {
+      const available = product.stock - currentQuantity;
+
+      if (available <= 0) {
+        return {
+          ok: false,
+          message: 'Ya agregaste a tu carrito todas las unidades disponibles.',
+        };
+      }
+
+      if (currentQuantity > 0) {
+        return {
+          ok: false,
+          message: `Ya tenés ${formatUnits(currentQuantity)} en tu carrito. Solo podés agregar ${formatUnits(available)} más.`,
+        };
+      }
+
       return {
         ok: false,
-        message: `No hay stock suficiente. Stock: ${product.stock}, ya en el carrito: ${currentQuantity}.`,
+        message:
+          product.stock === 1
+            ? 'Solo queda 1 unidad disponible.'
+            : `Solo quedan ${product.stock} unidades disponibles.`,
       };
     }
 
@@ -64,20 +91,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!Number.isInteger(quantity) || quantity < 1) {
       return {
         ok: false,
-        message: 'La cantidad debe ser un número entero mayor o igual a 1.',
+        message: 'Ingresá una cantidad válida (mínimo 1).',
       };
     }
 
     const existing = items.find((item) => item.product.id === productId);
 
     if (!existing) {
-      return { ok: false, message: 'El producto no está en el carrito.' };
+      return { ok: false, message: 'Este producto ya no está en tu carrito.' };
     }
 
     if (quantity > existing.product.stock) {
       return {
         ok: false,
-        message: `No hay stock suficiente. Stock máximo: ${existing.product.stock}.`,
+        message:
+          existing.product.stock === 1
+            ? 'Solo hay 1 unidad disponible.'
+            : `Solo hay ${existing.product.stock} unidades disponibles.`,
       };
     }
 
