@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 import models  # noqa: F401  (registra las tablas antes de crearlas)
 from database import Base, SessionLocal, engine
-from routers import orders, products
+from routers import auth, orders, products
 from seed import seed_products
 
 
@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="DarkMoon Store API",
     description="API de la tienda de Halloween DarkMoon Store (proyecto académico).",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -40,7 +40,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    # Authorization: necesario para enviar el token de la sesión.
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -64,6 +65,7 @@ async def validation_exception_handler(
 
 app.include_router(products.router)
 app.include_router(orders.router)
+app.include_router(auth.router)
 
 
 @app.get("/", tags=["Inicio"], summary="Estado de la API")
