@@ -3,7 +3,8 @@ import ProductCard from '../components/ProductCard';
 import { products } from '../data/products';
 import { CATEGORIES, CATEGORY_LABELS } from '../types';
 
-const FEATURED_IDS = [1, 4, 7, 9];
+// Uno por categoría: Vampiro, Calabaza, Máscara de Calavera y Kit Zombie.
+const FEATURED_IDS = [1, 10, 20, 28];
 
 export default function Home() {
   const featuredProducts = products.filter((product) =>
