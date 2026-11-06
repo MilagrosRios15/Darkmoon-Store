@@ -8,9 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import Order, Product, User
+from models import Order, Product
 from schemas import OrderCreate, OrderOut
-from security import get_current_user
 
 router = APIRouter(prefix="/api/orders", tags=["Pedidos"])
 
@@ -29,17 +28,12 @@ def order_to_out(order: Order) -> OrderOut:
     "",
     response_model=OrderOut,
     status_code=status.HTTP_201_CREATED,
-    summary="Crear un pedido (requiere sesión iniciada)",
+    summary="Crear un pedido",
 )
-def create_order(
-    order_in: OrderCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
+def create_order(order_in: OrderCreate, db: Session = Depends(get_db)):
     """Valida el pedido, verifica stock, calcula el total, descuenta y registra.
 
-    Requiere sesión iniciada. Todo ocurre en una sola transacción:
-    si algo falla, no se guarda nada.
+    Todo ocurre en una sola transacción: si algo falla, no se guarda nada.
     """
     # 1. Si el mismo producto viene repetido, se suman sus cantidades.
     quantities: dict[int, int] = {}
@@ -105,11 +99,10 @@ def create_order(
                     "procesaba el pedido. Revisá las cantidades e intentá de nuevo.",
                 )
 
-        # 6. Registrar el pedido (con el usuario) y confirmar la transacción.
+        # 6. Registrar el pedido y confirmar la transacción.
         order = Order(
             total=round(total, 2),
             items_json=json.dumps(items_detail, ensure_ascii=False),
-            user_id=current_user.id,
         )
         db.add(order)
         db.commit()

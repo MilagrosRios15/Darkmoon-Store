@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
 function SearchIcon() {
@@ -44,29 +43,8 @@ function CloseIcon() {
   );
 }
 
-function UserIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
-    </svg>
-  );
-}
-
 export default function Header() {
   const { totalItems } = useCart();
-  const { user, checking, logout } = useAuth();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [term, setTerm] = useState('');
@@ -95,9 +73,6 @@ export default function Header() {
     }
   };
 
-  // Solo el primer nombre, para que entre en el Header.
-  const firstName = user ? user.name.split(' ')[0] : '';
-
   return (
     <header className="header">
       <div className="header-inner">
@@ -114,7 +89,7 @@ export default function Header() {
             height="40"
           />
           <span className="brand-text">
-            <span className="brand-name">DarkMoon Store</span>
+            <span className="brand-name">DarkMoon</span>
             <span className="brand-tagline">Tienda de Halloween</span>
           </span>
         </Link>
@@ -153,31 +128,6 @@ export default function Header() {
             <NavLink to="/cart">
               Carrito <span className="cart-badge">{totalItems}</span>
             </NavLink>
-
-            {/* Mientras se verifica la sesión guardada no se muestra nada. */}
-            {!checking &&
-              (user ? (
-                <span className="nav-account">
-                  <span className="nav-user" title={user.email}>
-                    <UserIcon />
-                    <span className="nav-user-name">{firstName}</span>
-                  </span>
-                  <button
-                    type="button"
-                    className="nav-logout"
-                    onClick={() => {
-                      void logout();
-                    }}
-                  >
-                    Cerrar sesión
-                  </button>
-                </span>
-              ) : (
-                <NavLink to="/login" className="nav-login">
-                  <UserIcon />
-                  Ingresar
-                </NavLink>
-              ))}
           </nav>
         )}
 

@@ -9,9 +9,6 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 CATEGORIES = ("disfraces", "decoracion", "accesorios", "maquillaje")
 Category = Literal["disfraces", "decoracion", "accesorios", "maquillaje"]
 
-# Formato básico de email: algo@algo.algo (sin espacios).
-EMAIL_PATTERN = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
-
 
 # ---------- Productos ----------
 
@@ -109,70 +106,3 @@ class OrderOut(BaseModel):
     created_at: datetime
     total: float
     items: list[OrderItemOut]
-
-
-# ---------- Cuentas ----------
-
-class UserCreate(BaseModel):
-    """Datos para crear una cuenta."""
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [
-                {
-                    "name": "Milagros",
-                    "email": "mili@ejemplo.com",
-                    "password": "halloween2026",
-                }
-            ]
-        }
-    )
-
-    name: str = Field(min_length=2, max_length=80)
-    email: str = Field(max_length=120, pattern=EMAIL_PATTERN)
-    password: str = Field(min_length=8, max_length=128)  # mínimo 8 caracteres
-
-    @field_validator("name")
-    @classmethod
-    def clean_name(cls, value: str) -> str:
-        """Quita espacios de más y exige al menos 2 caracteres reales."""
-        cleaned = " ".join(value.split())
-        if len(cleaned) < 2:
-            raise ValueError("El nombre debe tener al menos 2 caracteres.")
-        return cleaned
-
-    @field_validator("email", mode="before")
-    @classmethod
-    def normalize_email(cls, value: object) -> object:
-        """Guarda el email sin espacios y en minúsculas."""
-        return value.strip().lower() if isinstance(value, str) else value
-
-
-class UserLogin(BaseModel):
-    """Datos para iniciar sesión."""
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [{"email": "mili@ejemplo.com", "password": "halloween2026"}]
-        }
-    )
-
-    email: str = Field(min_length=1, max_length=120)
-    password: str = Field(min_length=1, max_length=128)
-
-
-class UserOut(BaseModel):
-    """Datos públicos de un usuario (nunca incluye la contraseña)."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    name: str
-    email: str
-
-
-class AuthResponse(BaseModel):
-    """Respuesta al crear cuenta o iniciar sesión."""
-
-    token: str
-    user: UserOut
