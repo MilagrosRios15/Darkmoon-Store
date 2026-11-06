@@ -162,31 +162,23 @@ export default function Products() {
             </button>
           </div>
         </div>
-      ) : (
-        <>
-          <p className="results-count">
-            Mostrando {visibleProducts.length} producto(s)
-          </p>
-
-          {visibleProducts.length === 0 ? (
-            <div className="empty-results">
-              {searchTerm !== '' ? (
-                <>
-                  <p>No encontramos productos que coincidan con tu búsqueda.</p>
-                  <p>Probá con otra palabra o limpiá la búsqueda.</p>
-                </>
-              ) : (
-                <p>Por ahora no hay productos en esta categoría.</p>
-              )}
-            </div>
+      ) : visibleProducts.length === 0 ? (
+        <div className="empty-results">
+          {searchTerm !== '' ? (
+            <>
+              <p>No encontramos productos que coincidan con tu búsqueda.</p>
+              <p>Probá con otra palabra o limpiá la búsqueda.</p>
+            </>
           ) : (
-            <div className="product-grid">
-              {visibleProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <p>Por ahora no hay productos en esta categoría.</p>
           )}
-        </>
+        </div>
+      ) : (
+        <div className="product-grid">
+          {visibleProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       )}
     </div>
   );

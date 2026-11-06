@@ -1929,3 +1929,52 @@ body::after {
     animation: none;
   }
 }
+/* =========================================
+   Tipografía decorativa: Metamorphous
+   ========================================= */
+
+:root {
+  --font-display: 'Metamorphous', 'Playfair Display', Georgia, serif;
+  --font-display-weight: 700;
+}
+
+/* Título grande del Inicio */
+#hero-title,
+#hero-title span {
+  font-family: var(--font-display);
+  font-weight: var(--font-display-weight);
+  font-style: normal;
+  letter-spacing: 0.01em;
+  line-height: 1.12;
+}
+
+/* Nombre de la marca en el Header y el Footer */
+.brand-name,
+.footer-name {
+  font-family: var(--font-display);
+  font-weight: var(--font-display-weight);
+  letter-spacing: 0.04em;
+}
+
+/* Títulos de página: Productos, Carrito, 404, Producto no encontrado */
+.main > div > h1 {
+  font-family: var(--font-display);
+  font-weight: var(--font-display-weight);
+  letter-spacing: 0.02em;
+}
+
+/* Títulos de sección del Inicio: "Explorá por categoría" y "Productos destacados" */
+.section-head h2 {
+  font-family: var(--font-display);
+  font-weight: var(--font-display-weight);
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* En celulares chicos, la marca un poco más chica para que entre */
+@media (max-width: 420px) {
+  .brand-name {
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+  }
+}
